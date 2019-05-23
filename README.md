@@ -1,42 +1,37 @@
-# sketch-plugin
+## Sketch插件开发小结
 
-## Installation
+### 调试工具
+#### 日志
+[下载sketch-dev-tool](https://github.com/skpm/sketch-dev-tools/releases)
 
-- [Download](../../releases/latest/download/sketch-plugin.sketchplugin.zip) the latest release of the plugin
-- Un-zip
-- Double-click on sketch-plugin.sketchplugin
+#### 断点调试
+打开Safari，找到开发 --> 你的机器名 --> `Automatically Show Web Inspector for JSContexts`，并且打开同目录下的 `Automatically Pause Connecting to JSContext`，注意调脚本运行完成会自动销毁上下文，刷新应用会再次打开一个调试器，这不是一个bug。
 
-## Development Guide
-
-_This plugin was created using `skpm`. For a detailed explanation on how things work, checkout the [skpm Readme](https://github.com/skpm/skpm/blob/master/README.md)._
-
-### Usage
-
-Install the dependencies
-
+### 开启审查webview
+此功能类似Chrome里的审查元素功能，但是开启的审查器貌似是Safari，如何开启Chrome调试器还在研究。
 ```bash
-npm install
+defaults write com.bohemiancoding.sketch3 WebKitDeveloperExtras -bool true
 ```
 
-Once the installation is done, you can run some commands inside the project folder:
-
+### Sketch启动时重新加载脚本
+Sketch默认会缓存其安装目录下Plugins文件夹里的文件，这不方便我们开发调试，禁用缓存可使用以下代码开启：
 ```bash
-npm run build
+defaults write ~/Library/Preferences/com.bohemiancoding.sketch3.plist AlwaysReloadScript -bool YES
 ```
 
-To watch for changes:
 
+### 指定Sketch编辑插件的编辑器
+以vscode为例:
 ```bash
-npm run watch
+defaults write ~/Library/Preferences/com.bohemiancoding.sketch3.plist "Plugin Editor" "/usr/local/bin/code"
 ```
 
-Additionally, if you wish to run the plugin every time it is built:
 
-```bash
-npm run start
-```
+### CocoaScript
+CocoaScript建立在Apple的JavaScriptCore之上，这是与Safari相同的JavaScript引擎。CocoaScript还包含一个桥梁，可让您通过JavaScript访问Apple的Cocoa框架。这意味着除了标准JavaScript库之外，您还可以使用许多精彩的类和函数。
 
-### Custom Configuration
+
+### 自定义配置
 
 #### Babel
 
@@ -60,33 +55,5 @@ To customize webpack create `webpack.skpm.config.js` file which exports function
  **/
 module.exports = function(config, isPluginCommand) {
   /** you can change config here **/
-}
-```
-
-### Debugging
-
-To view the output of your `console.log`, you have a few different options:
-
-- Use the [`sketch-dev-tools`](https://github.com/skpm/sketch-dev-tools)
-- Run `skpm log` in your Terminal, with the optional `-f` argument (`skpm log -f`) which causes `skpm log` to not stop when the end of logs is reached, but rather to wait for additional data to be appended to the input
-
-### Publishing your plugin
-
-```bash
-skpm publish <bump>
-```
-
-(where `bump` can be `patch`, `minor` or `major`)
-
-`skpm publish` will create a new release on your GitHub repository and create an appcast file in order for Sketch users to be notified of the update.
-
-You will need to specify a `repository` in the `package.json`:
-
-```diff
-...
-+ "repository" : {
-+   "type": "git",
-+   "url": "git+https://github.com/ORG/NAME.git"
-+  }
-...
+};
 ```

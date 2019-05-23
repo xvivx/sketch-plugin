@@ -1,9 +1,8 @@
 {
   "name": "sketch-plugin",
-  "description": "",
   "version": "0.1.0",
   "engines": {
-    "sketch": ">=49.0"
+    "sketch": ">=3.0"
   },
   "skpm": {
     "name": "sketch-plugin",
@@ -17,10 +16,19 @@
   "scripts": {
     "build": "skpm-build",
     "watch": "skpm-build --watch",
-    "start": "skpm-build --watch --run",
+    "start": "skpm-build --watch",
     "postinstall": "npm run build && skpm-link"
   },
   "devDependencies": {
-    "@skpm/builder": "^0.7.0"
+    "@skpm/builder": "^0.5.11",
+    "@skpm/extract-loader": "^2.0.2",
+    "css-loader": "^1.0.0",
+    "html-loader": "^0.5.1"
+  },
+  "resources": [
+    "resources/**/*.js"
+  ],
+  "dependencies": {
+    "sketch-module-web-view": "^3.0.1"
   }
 }
