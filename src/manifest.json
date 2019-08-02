@@ -4,14 +4,18 @@
   "commands": [
     {
       "name": "sketch-plugin",
-      "identifier": "sketch-plugin.my-command-identifier",
-      "script": "./my-command.js",
+      "script": "./app.js",
       "handlers": {
-        "run": "onRun",
         "actions": {
-          "Shutdown": "onShutdown"
+          "Startup": "onStartup"
         }
       }
+    },
+    {
+      "name": "sketch-plugin",
+      "identifier": "sketch-plugin.my-command-identifier",
+      "shortcut": "command shift i",
+      "script": "./app.js"
     }
   ],
   "menu": {

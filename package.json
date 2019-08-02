@@ -10,13 +10,11 @@
     "main": "sketch-plugin.sketchplugin",
     "assets": [
       "assets/**/*"
-    ],
-    "sketch-assets-file": "sketch-assets/icons.sketch"
+    ]
   },
   "scripts": {
     "build": "skpm-build",
-    "watch": "skpm-build --watch",
-    "start": "skpm-build --watch",
+    "dev": "skpm-build --watch",
     "postinstall": "npm run build && skpm-link"
   },
   "devDependencies": {
@@ -29,6 +27,7 @@
     "resources/**/*.js"
   ],
   "dependencies": {
+    "cocoascript-class": "^0.1.2",
     "sketch-module-web-view": "^3.0.1"
   }
 }
