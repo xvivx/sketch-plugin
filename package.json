@@ -15,6 +15,7 @@
   "scripts": {
     "build": "skpm-build",
     "dev": "skpm-build --watch",
+    "start": "skpm-build --watch --run",
     "postinstall": "npm run build && skpm-link"
   },
   "devDependencies": {

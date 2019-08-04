@@ -77,7 +77,8 @@ var Wrapper = CocoaClass({
   },
 });
 
-function wrapFunc(context) {
+
+export default function wrapFunc(context) {
   switch (Object.prototype.toString.call(context)) {
     case '[object String]': {
       return NSString.stringWithString(context);
@@ -98,5 +99,3 @@ function wrapFunc(context) {
       return context;
   }
 }
-
-export default wrapFunc;

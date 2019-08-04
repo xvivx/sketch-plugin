@@ -1,5 +1,5 @@
 import CocoaClass from 'cocoascript-class';
-import wrap from '../wrap';
+import wrap from './wrap';
 
 var BrowserView = CocoaClass({
   className: 'BrowserView',
@@ -13,11 +13,8 @@ var BrowserView = CocoaClass({
     if (!this.bridge) {
       return;
     }
-    
-    this.windowScriptObject().setValue_forKey_(
-      wrap(this.bridge),
-      this.bridge._name
-    );
+
+    this.windowScriptObject().setValue_forKey_(wrap(this.bridge), this.bridge._name);
   },
 });
 
