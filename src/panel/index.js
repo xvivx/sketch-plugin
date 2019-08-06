@@ -1,14 +1,24 @@
 import CocoaClass from 'cocoascript-class';
 import createWebview from '../webview';
-import bridge from './bridge';
+import createBridge from './bridge';
 import { WRBVIEW_FRAME_URL } from '../config';
+
+function v(e){
+  var t=[];
+  if("MSLayerArray"==e.class()){
+    for(var n=0,r=e.containedLayersCount();n<r;++n){
+      t.push(e.layerAtIndex(n))
+    };
+  }else t.push(e);
+  return t.map(s.default);
+}
 
 var Panel = CocoaClass({
   className: 'Panel',
   create(context, document) {
     this.context = context;
     this.document = document;
-    this.webview = createWebview(bridge(context, document));
+    this.webview = createWebview(createBridge(context, document));
     this.webview.setMainFrameURL(WRBVIEW_FRAME_URL);
     this.render();
 
@@ -44,7 +54,7 @@ var Panel = CocoaClass({
     // 检查器里的sketch的logo
     var sketchIcon = NSImage.new().initWithContentsOfFile(this.loadFile('sketch.png'));
     // 插件的logo
-    var webviewIcon = NSImage.new().initWithContentsOfFile(this.loadFile('fusion.png'));
+    var webviewIcon = NSImage.new().initWithContentsOfFile(this.loadFile('micro-app-plugin.png'));
     
     sketchRightInterface.subviews().some(function (view, index, views) {
       sketchInspectorPanel = views.objectAtIndex(index).subviews().objectAtIndex(0);
@@ -160,6 +170,42 @@ var Panel = CocoaClass({
     sketchInspectorPanel.addArrangedSubview(bgView);
     sketchInspectorPanel.addArrangedSubview(this.sketchOriginalInspectorBackgroundView)
     COScript.currentCOScript().shouldKeepAround = false;
+  },
+  closeDocument(){
+    this.webview.close();
+    NSDistributedNotificationCenter.defaultCenter().removeObserver(this);
+    COScript.currentCOScript().shouldKeepAround = false;
+  },
+  onSelectionChanged() {
+    var selection = this.document.selectedLayers();
+    var choosed = selection.layerAtIndex(0);
+    var isValid = selection.containedLayersCount() === 1 && choosed.class() === 'MSLayerGroup';
+    var loading = choosed.layers() && choosed.layers()[0] || {};
+    var componentName = /^__magic:(.*?)(?:,(.*))?$/.exec(loading.name());
+  
+    console.log('匹配到的组件名称1: ' + componentName[1] + '-2-' + componentName[2]);
+    
+    if(isValid && componentName) {
+      if(componentName[2] === 'artboard') {
+        var ancestor = choosed.ancestors()[choosed.ancestors().length-1];
+        var artboard = MSArtboardGroup.alloc().init();
+  
+        artboard.frame().setX(choosed.frame().x());
+        artboard.frame().setY(choosed.frame().y());
+        artboard.frame().setWidth(choosed.frame().width());
+        artboard.frame().setHeight(choosed.frame().height());
+  
+        ancestor.removeLayer(choosed);
+        ancestor.addLayer(artboard);
+  
+        artboard.select_byExpandingSelection(true, false);
+        choosed = artboard;
+      }
+  
+      choosed.name = componentName[1];
+    }
+  
+    this.selectionChangedCallback && this.selectionChangedCallback(v(e));
   }
 });
 
