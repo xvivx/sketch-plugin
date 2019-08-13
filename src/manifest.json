@@ -10,7 +10,9 @@
         "actions": {
           "Startup": "onStartup",
           "Shutdown": "onShutdown",
-          "OpenDocument": "onOpenDocument"
+          "OpenDocument": "onOpenDocument",
+          "SelectionChanged.finish": "onSelectionChangedFinish",
+          "CloseDocument": "onCloseDocument"
         }
       }
     },

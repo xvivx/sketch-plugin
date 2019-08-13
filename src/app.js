@@ -59,7 +59,7 @@ export function onCloseDocument(context) {
 }
 
 export function onSelectionChangedFinish(context) {
-  var document = NSThread.mainThread().threadDictionary()[n.actionContext.document];
+  var document = NSThread.mainThread().threadDictionary()[context.actionContext.document];
 
   document && document.onSelectionChanged();
 }

@@ -2,15 +2,20 @@ import CocoaClass from 'cocoascript-class';
 import createWebview from '../webview';
 import createBridge from './bridge';
 import { WRBVIEW_FRAME_URL } from '../config';
+import draw from '../layer/index';
 
-function v(e){
-  var t=[];
-  if("MSLayerArray"==e.class()){
-    for(var n=0,r=e.containedLayersCount();n<r;++n){
-      t.push(e.layerAtIndex(n))
+function layerToArray(layer){
+  var layers = [];
+
+  if ('MSLayerArray' === String(layer.class())){
+    for(var index = 0, count = layer.containedLayersCount(); index < count; ++index){
+      layers.push(layer.layerAtIndex(index));
     };
-  }else t.push(e);
-  return t.map(s.default);
+  } else {
+    layers.push(layer);
+  };
+  
+  return layers.map(draw);
 }
 
 var Panel = CocoaClass({
@@ -18,7 +23,7 @@ var Panel = CocoaClass({
   create(context, document) {
     this.context = context;
     this.document = document;
-    this.webview = createWebview(createBridge(context, document));
+    this.webview = createWebview(createBridge(this, document));
     this.webview.setMainFrameURL(WRBVIEW_FRAME_URL);
     this.render();
 
@@ -176,36 +181,49 @@ var Panel = CocoaClass({
     NSDistributedNotificationCenter.defaultCenter().removeObserver(this);
     COScript.currentCOScript().shouldKeepAround = false;
   },
+
   onSelectionChanged() {
+    var isGroup;
+    var selected;
     var selection = this.document.selectedLayers();
-    var choosed = selection.layerAtIndex(0);
-    var isValid = selection.containedLayersCount() === 1 && choosed.class() === 'MSLayerGroup';
-    var loading = choosed.layers() && choosed.layers()[0] || {};
-    var componentName = /^__magic:(.*?)(?:,(.*))?$/.exec(loading.name());
-  
-    console.log('匹配到的组件名称1: ' + componentName[1] + '-2-' + componentName[2]);
-    
-    if(isValid && componentName) {
-      if(componentName[2] === 'artboard') {
-        var ancestor = choosed.ancestors()[choosed.ancestors().length-1];
-        var artboard = MSArtboardGroup.alloc().init();
-  
-        artboard.frame().setX(choosed.frame().x());
-        artboard.frame().setY(choosed.frame().y());
-        artboard.frame().setWidth(choosed.frame().width());
-        artboard.frame().setHeight(choosed.frame().height());
-  
-        ancestor.removeLayer(choosed);
-        ancestor.addLayer(artboard);
-  
-        artboard.select_byExpandingSelection(true, false);
-        choosed = artboard;
-      }
-  
-      choosed.name = componentName[1];
+
+    if(selection.containedLayersCount() === 1) {
+      selected = selection.layerAtIndex(0);
+      isGroup = String(selected.class()) === 'MSLayerGroup';
+    } else {
+      selected = selection;
     }
   
-    this.selectionChangedCallback && this.selectionChangedCallback(v(e));
+    if(isGroup && (selected.layers().length === 1 || selected.layers().length === 2 && String(selected.layers()[1].name()) === 'loading')) {
+      var loading = selected.layers() && selected.layers()[0] || {};
+      var componentName = /^__magic:(.*?)(?:,(.*))?$/.exec(loading.name());
+      
+      if(componentName) {
+        if(componentName[2] === 'artboard') {
+          var ancestor = selected.ancestors()[selected.ancestors().length-1];
+          var artboard = MSArtboardGroup.alloc().init();
+    
+          artboard.frame().setX(selected.frame().x());
+          artboard.frame().setY(selected.frame().y());
+          artboard.frame().setWidth(selected.frame().width());
+          artboard.frame().setHeight(selected.frame().height());
+    
+          ancestor.removeLayer(selected);
+          ancestor.addLayer(artboard);
+    
+          artboard.select_byExpandingSelection(true, false);
+          selected = artboard;
+        }
+        
+        selected.name = componentName[1];
+      }
+    }
+  
+    if (this.selectionChangedCallback) {
+      console.log('绘制。。。', this.selectionChangedCallback.toString());
+      
+      this.selectionChangedCallback(layerToArray(selected));
+    }
   }
 });
 

@@ -19,6 +19,7 @@
     "postinstall": "npm run build && skpm-link"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.5.5",
     "@skpm/builder": "^0.5.11",
     "@skpm/extract-loader": "^2.0.2",
     "css-loader": "^1.0.0",
@@ -29,6 +30,11 @@
   ],
   "dependencies": {
     "cocoascript-class": "^0.1.2",
-    "sketch-module-web-view": "^3.0.1"
+    "murmur2js": "^1.0.0",
+    "normalize-css-color": "^1.0.2",
+    "sketch-constants": "^1.1.0",
+    "sketch-module-web-view": "^3.0.1",
+    "sketchapp-json-plugin": "^0.1.2",
+    "yoga-layout": "^1.9.3"
   }
 }

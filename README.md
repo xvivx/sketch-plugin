@@ -57,3 +57,6 @@ module.exports = function(config, isPluginCommand) {
   /** you can change config here **/
 };
 ```
+
+
+sketch原生的对象里的函数只能return原生的东西，不能return js里的东西。

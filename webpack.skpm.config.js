@@ -1,5 +1,11 @@
 module.exports = function (config) {  
+  var ruleJs = config.module.rules.find(rule => rule.use.loader === 'babel-loader');
+  
+  ruleJs.use.options.plugins = ruleJs.plugins || [];
+  ruleJs.use.options.plugins.push('@babel/plugin-proposal-class-properties');
+  
   config.devtool = 'cheap-module-source-map';
+  
   // config.module.rules.push({
   //   test: /\.(html)$/,
   //   use: [{
