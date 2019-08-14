@@ -220,8 +220,6 @@ var Panel = CocoaClass({
     }
   
     if (this.selectionChangedCallback) {
-      console.log('绘制。。。', this.selectionChangedCallback.toString());
-      
       this.selectionChangedCallback(layerToArray(selected));
     }
   }

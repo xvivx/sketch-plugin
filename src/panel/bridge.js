@@ -1,4 +1,8 @@
+import Export from '../export';
+
 export default function bridge(context, document) {
+  var exportor;
+
   return {
     _name: 'sketch',
     message(text) {
@@ -12,11 +16,16 @@ export default function bridge(context, document) {
     },
     version() {
       return {
-        sketch: NSBundle.mainBundle()
-          .infoDictionary()
-          .CFBundleShortVersionString.UTF8String(),
+        sketch: NSBundle.mainBundle().infoDictionary().CFBundleShortVersionString.UTF8String(),
         plugin: '1.0.0',
       };
     },
+    exportSketchJson() {
+      exportor = exportor || new Export(NSDocumentController.sharedDocumentController().currentDocument());
+      if(exportor) {
+        document.showMessage('导出');
+      }
+      return exportor.export();
+    }
   };
 }
