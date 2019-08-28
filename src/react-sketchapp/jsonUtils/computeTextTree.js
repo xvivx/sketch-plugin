@@ -1,7 +1,9 @@
 // @flow
+import type { TreeNode } from '../types';
+import type Context from '../utils/Context';
 import { VALID_TEXT_CHILDREN_TYPES } from '../utils/constants';
 
-const walkTextTree = (textTree, context, textNodes) => {
+const walkTextTree = (textTree: TreeNode, context: Context, textNodes: Array<Object>) => {
   if (typeof textTree !== 'string' && !VALID_TEXT_CHILDREN_TYPES.includes(textTree.type)) {
     throw new Error(`"${textTree.type}" is not a valid child for Text components`);
   }
@@ -24,7 +26,7 @@ const walkTextTree = (textTree, context, textNodes) => {
   }
 };
 
-const computeTextTree = (node, context, textNodes = []) => {
+const computeTextTree = (node: TreeNode, context: Context, textNodes: Array<Object> = []) => {
   const { children } = node;
 
   if (children) {

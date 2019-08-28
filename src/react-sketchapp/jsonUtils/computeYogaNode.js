@@ -1,15 +1,17 @@
 // @flow
 import * as yoga from 'yoga-layout';
+import type { TreeNode, ViewStyle } from '../types';
+import Context from '../utils/Context';
 import createStringMeasurer from '../utils/createStringMeasurer';
 import hasAnyDefined from '../utils/hasAnyDefined';
 import pick from '../utils/pick';
 import computeTextTree from './computeTextTree';
 import { INHERITABLE_FONT_STYLES } from '../utils/constants';
 import isNullOrUndefined from '../utils/isNullOrUndefined';
-
+import { getSymbolMasterById } from '../symbol';
 
 // flatten all styles (including nested) into one object
-export const getStyles = (node) => {
+export const getStyles = (node: TreeNode): ViewStyle | Object => {
   let { style } = node.props;
 
   if (Array.isArray(style)) {
@@ -23,21 +25,19 @@ export const getStyles = (node) => {
 };
 
 const computeYogaNode = (
-  node,
-  context,
-) => {
+  node: TreeNode,
+  context: Context,
+): { node: yoga.Yoga$Node, stop?: boolean } => {
   const yogaNode = yoga.Node.create();
   const hasStyle = node.props && node.props.style;
-  const style = hasStyle ? getStyles(node) : {};
+  const style: ViewStyle | Object = hasStyle ? getStyles(node) : {};
 
   // Setup default symbol instance dimensions
   if (node.type === 'symbolinstance') {
-    console.log(`symbolinstance类型，需要补齐symbol`);
-    
-    // const symbolProps = node.props;
-    // const { frame } = getSymbolMasterById(symbolProps.symbolID);
-    // yogaNode.setWidth(frame.width);
-    // yogaNode.setHeight(frame.height);
+    const symbolProps = node.props;
+    const { frame } = getSymbolMasterById(symbolProps.symbolID);
+    yogaNode.setWidth(frame.width);
+    yogaNode.setHeight(frame.height);
   }
 
   if (node.type === 'svg') {

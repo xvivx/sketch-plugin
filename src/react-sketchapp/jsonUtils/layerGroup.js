@@ -1,5 +1,5 @@
 
-import { makeResizeConstraint } from './hacksForJSONImpl';
+import makeResizeConstraint from './resizeConstraint';
 import { generateID, makeRect } from './models';
 
 const layerGroup = (

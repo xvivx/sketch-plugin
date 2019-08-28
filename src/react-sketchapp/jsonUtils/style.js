@@ -1,9 +1,21 @@
-// @flow
-import { BorderPosition } from 'sketch-constants';
-import { makeRect, makeColorFromCSS } from './models';
-import { makeHorizontalPath, makeVerticalPath, makeShapePath, makeShapeGroup } from './shapeLayers';
+
+import { makeColorFromCSS, makeColorFill } from './models';
+import hasAnyDefined from '../utils/hasAnyDefined';
 
 const DEFAULT_SHADOW_COLOR = '#000';
+
+const SHADOW_STYLES = [
+  'shadowColor',
+  'shadowOffset',
+  'shadowOpacity',
+  'shadowRadius',
+  'shadowSpread',
+  'textShadowColor',
+  'textShadowOffset',
+  'textShadowOpacity',
+  'textShadowRadius',
+  'textShadowSpread',
+];
 
 const makeDashPattern = (style, width) => {
   switch (style) {
@@ -21,21 +33,40 @@ const makeDashPattern = (style, width) => {
 export const makeBorderOptions = (
   style,
   width,
+  lineCapStyle = 0,
+  lineJoinStyle = 0,
 ) => ({
   _class: 'borderOptions',
   isEnabled: false,
   dashPattern: makeDashPattern(style, width),
-  lineCapStyle: 0,
-  lineJoinStyle: 0,
+  lineCapStyle,
+  lineJoinStyle,
 });
 
 export const makeShadow = (style) => {
-  const opacity = style.shadowOpacity !== undefined ? style.shadowOpacity : 1;
-  const color = style.shadowColor || style.color || DEFAULT_SHADOW_COLOR;
-  const radius = style.shadowRadius !== undefined ? style.shadowRadius : 1;
+  /* eslint-disable no-nested-ternary */
+  const opacity =
+    style.shadowOpacity !== undefined
+      ? style.shadowOpacity
+      : style.textShadowOpacity !== undefined
+      ? style.textShadowOpacity
+      : 1;
+  const color = style.shadowColor || style.textShadowColor || DEFAULT_SHADOW_COLOR;
+  const radius =
+    style.shadowRadius !== undefined
+      ? style.shadowRadius
+      : style.textShadowRadius !== undefined
+      ? style.textShadowRadius
+      : 1;
   const _class = style.shadowInner !== undefined ? 'innerShadow' : 'shadow';
-  const spread = style.shadowSpread !== undefined ? style.shadowSpread : 0;
-  const { width: offsetX = 0, height: offsetY = 0 } = style.shadowOffset || {};
+  const spread =
+    style.shadowSpread !== undefined
+      ? style.shadowSpread
+      : style.textShadowSpread !== undefined
+      ? style.textShadowSpread
+      : 1;
+  const { width: offsetX = 0, height: offsetY = 0 } =
+    style.shadowOffset || style.textShadowOffset || {};
 
   return {
     _class,
@@ -53,50 +84,54 @@ export const makeShadow = (style) => {
   };
 };
 
-export const makeVerticalBorder = (
-  x,
-  y,
-  length,
-  thickness,
-  color,
+export const makeStyle = (
+  style,
+  fills,
+  shadowsProp,
 ) => {
-  const frame = makeRect(x, y, thickness, length);
-  const shapeFrame = makeRect(0, 0, thickness, length);
-  const shapePath = makeShapePath(shapeFrame, makeVerticalPath());
-  const content = makeShapeGroup(frame, [shapePath]);
-  content.style.borders = [
-    {
-      _class: 'border',
-      isEnabled: true,
-      color: makeColorFromCSS(color),
-      fillType: 0,
-      position: BorderPosition.Center,
-      thickness,
-    },
-  ];
-  return content;
-};
+  const json = {
+    _class: 'style',
+    endDecorationType: 0,
+    fills: [],
+    miterLimit: 10,
+    startDecorationType: 0,
+    innerShadows: [],
+    shadows: [],
+  };
 
-export const makeHorizontalBorder = (
-  x,
-  y,
-  length,
-  thickness,
-  color,
-) => {
-  const frame = makeRect(x, y, length, thickness);
-  const shapeFrame = makeRect(0, 0, length, thickness);
-  const shapePath = makeShapePath(shapeFrame, makeHorizontalPath());
-  const content = makeShapeGroup(frame, [shapePath]);
-  content.style.borders = [
-    {
-      _class: 'border',
-      isEnabled: true,
-      color: makeColorFromCSS(color),
-      fillType: 0,
-      position: BorderPosition.Center,
-      thickness,
-    },
-  ];
-  return content;
+  if (fills && fills.length) {
+    json.fills = json.fills.concat(fills);
+  }
+
+  if (!style) {
+    return json;
+  }
+
+  if (style.backgroundColor) {
+    const fill = makeColorFill(style.backgroundColor);
+    json.fills.unshift(fill);
+  }
+
+  if (hasAnyDefined(style, SHADOW_STYLES)) {
+    const shadow = [makeShadow(style)];
+    if (style.shadowInner) {
+      json.innerShadows = shadow;
+    } else {
+      json.shadows = shadow;
+    }
+  }
+
+  if (shadowsProp) {
+    shadowsProp.map(shadowStyle => {
+      const shadow = makeShadow(shadowStyle);
+      if (shadowStyle.shadowInner) {
+        json.innerShadows.push(shadow);
+      } else {
+        json.shadows.push(shadow);
+      }
+      return shadowStyle;
+    });
+  }
+
+  return json;
 };

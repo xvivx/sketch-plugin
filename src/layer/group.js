@@ -1,7 +1,7 @@
+import UI from 'sketch/ui';
 import Layer from './layer';
-import buildTree from '../react-sketchapp/build-tree';
-import flexToSketchJSON from '../react-sketchapp/flex-to-sketch-json';
-import { fromSJSONDictionary } from 'sketchapp-json-plugin';
+import flexToSketchJSON from '../react-sketchapp/flexToSketchJSON';
+import { fromSJSONDictionary } from '@skpm/sketchapp-json-plugin';
 
 export default class Group extends Layer {
   render(data) {
@@ -35,9 +35,18 @@ export default class Group extends Layer {
     return svg.importAsLayer();
   }
   drawFromComponent(dataJson) {
-    var data = JSON.parse(dataJson);
-    var tree = buildTree(data);
-    var treeJson = flexToSketchJSON(tree);
+    var data;
+    var treeJson;
+
+    try {
+      data = JSON.parse(dataJson);
+    } catch(error) {
+      UI.message('绘制图层错误，原因是传入JSON不合法!');
+      console.error('invalidJSON: ', dataJson);
+      return ;
+    }
+
+    treeJson = flexToSketchJSON(data);
 
     return fromSJSONDictionary(treeJson);
   }

@@ -1,6 +1,8 @@
 // @flow
+import * as TestRenderer from 'react-test-renderer';
 import * as yoga from 'yoga-layout';
 import Context from './utils/Context';
+import type { TreeNode } from './types';
 import hasAnyDefined from './utils/hasAnyDefined';
 import pick from './utils/pick';
 import computeYogaTree from './jsonUtils/computeYogaTree';
@@ -8,7 +10,7 @@ import computeTextTree from './jsonUtils/computeTextTree';
 import { INHERITABLE_FONT_STYLES } from './utils/constants';
 import zIndex from './utils/zIndex';
 
-export const reactTreeToFlexTree = (node, yogaNode, context) => {
+export const reactTreeToFlexTree = (node: TreeNode, yogaNode: yoga.Yoga$Node, context: Context) => {
   let textNodes;
   let textStyle = context.getInheritedStyles();
   const style = node.props && node.props.style ? node.props.style : {};
@@ -42,9 +44,14 @@ export const reactTreeToFlexTree = (node, yogaNode, context) => {
 
     for (let index = 0; index < children.length; index += 1) {
       const childComponent = children[index];
-      const childNode = yogaNode.getChild(index);
-      const renderedChildComponent = reactTreeToFlexTree(childComponent, childNode, context.forChildren());
 
+      const childNode = yogaNode.getChild(index);
+
+      const renderedChildComponent = reactTreeToFlexTree(
+        childComponent,
+        childNode,
+        context.forChildren(),
+      );
       newChildren.push(renderedChildComponent);
     }
   }
@@ -69,9 +76,11 @@ export const reactTreeToFlexTree = (node, yogaNode, context) => {
   };
 };
 
-const buildTree = (json) => {
+const buildTree = (element: React$Element<any>): TreeNode => {
+  const renderer = TestRenderer.create(element);
+  const json: TreeNode = renderer.toJSON();
   const yogaNode = computeYogaTree(json, new Context());
-  yogaNode.calculateLayout(yoga.UNDEFINED, yoga.UNDEFINED, yoga.DIRECTION_LTR);
+  yogaNode.calculateLayout(undefined, undefined, yoga.DIRECTION_LTR);
   const tree = reactTreeToFlexTree(json, yogaNode, new Context());
 
   return tree;

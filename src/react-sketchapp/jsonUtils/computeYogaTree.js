@@ -1,8 +1,11 @@
-
+// @flow
+import * as yoga from 'yoga-layout';
 import computeYogaNode from './computeYogaNode';
+import type { TreeNode } from '../types';
+import Context from '../utils/Context';
 import zIndex from '../utils/zIndex';
 
-const walkTree = (tree, context) => {
+const walkTree = (tree: TreeNode, context: Context) => {
   const { node, stop } = computeYogaNode(tree, context);
 
   if (tree.type === 'svg') {
@@ -26,6 +29,6 @@ const walkTree = (tree, context) => {
 
   return node;
 };
-const treeToNodes = (root, context) => walkTree(root, context);
+const treeToNodes = (root: TreeNode, context: Context): yoga.Yoga$Node => walkTree(root, context);
 
 export default treeToNodes;

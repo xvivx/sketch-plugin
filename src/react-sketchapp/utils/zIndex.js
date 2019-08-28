@@ -1,6 +1,8 @@
+// @flow
+import type { TreeNode } from '../types';
 
 // Sort z-index values lowest to highest
-const zIndex = (nodes) =>
+const zIndex = (nodes: Array<TreeNode>): Array<TreeNode & { oIndex: number }> =>
   nodes
     .map((node, index) => ({
       ...node,

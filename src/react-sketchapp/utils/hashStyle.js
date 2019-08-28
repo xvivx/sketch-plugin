@@ -1,4 +1,4 @@
-
+// @flow
 import * as murmurHash from 'murmur2js';
 import sortObjectKeys from './sortObjectKeys';
 

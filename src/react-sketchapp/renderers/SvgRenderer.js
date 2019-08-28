@@ -1,6 +1,6 @@
 // @flow
 import ViewRenderer from './ViewRenderer';
-import { makeSvgLayer } from '../jsonUtils/hacksForJSONImpl';
+import makeSvgLayer from '../jsonUtils/svgLayer';
 
 const snakeExceptions = [
   'gradientUnits',
@@ -12,6 +12,7 @@ const snakeExceptions = [
   'specularExponent',
   'specularConstant',
   'surfaceScale',
+  'viewBox',
 ];
 function toSnakeCase(string) {
   if (string === 'href') {

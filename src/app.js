@@ -66,8 +66,5 @@ export function onSelectionChangedFinish(context) {
 
 
 export default function () {
-  var threadDictionary = NSThread.mainThread().threadDictionary();
-  console.log(threadDictionary);
-  
   UI.message('Hello sketch');
 }
